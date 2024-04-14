@@ -1,7 +1,8 @@
 import { Test } from '@nestjs/testing';
-import { CounterService } from './counter.service';
-import { Counter } from './counter.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+
+import { Counter } from './counter.entity';
+import { CounterService } from './counter.service';
 
 describe('CounterService', () => {
   let service: CounterService;
