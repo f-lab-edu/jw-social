@@ -30,7 +30,7 @@ describe('CounterController', () => {
   });
 
   describe('increment', () => {
-    it('카운터 증가 기능 검증', async () => {
+    it('증가된 카운터 값을 반환해야 한다', async () => {
       const returnedValue = 1;
       jest
         .spyOn(mockService, 'incrementCounter')
@@ -43,7 +43,7 @@ describe('CounterController', () => {
   });
 
   describe('getCurrentCounter 메소드', () => {
-    it('현재 카운터 값 조회 기능 검증', async () => {
+    it('현재 카운터 값 조회이 조회되어야 한다', async () => {
       const returnedValue = 0;
       jest.spyOn(mockService, 'getCounter').mockReturnValue(returnedValue);
 

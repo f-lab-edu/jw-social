@@ -1,8 +1,8 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
-import { Counter } from './counter.entity';
 import { CounterService } from './counter.service';
+import { Counter } from './entities/counter.entity';
 
 describe('CounterService', () => {
   let service: CounterService;
@@ -32,7 +32,7 @@ describe('CounterService', () => {
   });
 
   describe('getCounter 메소드', () => {
-    it('카운터를 조회할 때 기본값을 반환해야 함', async () => {
+    it('카운터를 조회할 때 현재까지 카운터 된 값을 반환해야 한다', async () => {
       const id = {
         id: 1,
       };
@@ -49,7 +49,7 @@ describe('CounterService', () => {
       expect(result).toBe(0);
     });
 
-    it('카운터가 없을 경우 새로 생성되어야 함', async () => {
+    it('저장된 카운터가 정보가 없을 경우 새로 생성되어야 한다', async () => {
       const counter = {
         id: 1,
         value: 0,
@@ -66,7 +66,7 @@ describe('CounterService', () => {
   });
 
   describe('incrementCounter 메소드', () => {
-    it('카운터 증가 후 증가된 값 반환', async () => {
+    it('카운터 증가 후 증가된 값을 반환해야 한다', async () => {
       const counter = {
         id: 1,
         value: 0,

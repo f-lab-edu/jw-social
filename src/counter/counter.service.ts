@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { Counter } from './counter.entity';
+import { Counter } from './entities/counter.entity';
 
 @Injectable()
 export class CounterService {
