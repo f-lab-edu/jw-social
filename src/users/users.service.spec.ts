@@ -54,6 +54,7 @@ describe('UserService', () => {
         id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
         createdAt: new Date(),
         updatedAt: new Date(),
+        posts: [],
         ...createUserDto,
       };
       mockRepository.create.mockReturnValue(resultUser);
@@ -92,6 +93,7 @@ describe('UserService', () => {
           password: 'asdasd123',
           createdAt: new Date(),
           updatedAt: new Date(),
+          posts: [],
         },
       ];
       mockRepository.find.mockResolvedValue(result);
@@ -109,6 +111,7 @@ describe('UserService', () => {
         password: 'asdasd123',
         createdAt: new Date(),
         updatedAt: new Date(),
+        posts: [],
       };
       mockRepository.findOneBy.mockResolvedValue(result);
 
@@ -138,6 +141,7 @@ describe('UserService', () => {
         password: 'asdasd123',
         createdAt: new Date(),
         updatedAt: new Date(),
+        posts: [],
       };
       const updatedUser: User = {
         ...existingUser,

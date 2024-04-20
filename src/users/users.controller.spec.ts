@@ -9,7 +9,7 @@ describe('UsersController', () => {
   let controller: UsersController;
   let service: UsersService;
 
-  const mockUserService = {
+  const mockUsersService = {
     create: jest.fn(),
     findAll: jest.fn(),
     findOne: jest.fn(),
@@ -23,7 +23,7 @@ describe('UsersController', () => {
       providers: [
         {
           provide: UsersService,
-          useValue: mockUserService,
+          useValue: mockUsersService,
         },
       ],
     }).compile();
@@ -48,7 +48,7 @@ describe('UsersController', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         ...user,
-      };
+      } as any;
 
       jest.spyOn(service, 'create').mockResolvedValue(result);
 
@@ -66,7 +66,7 @@ describe('UsersController', () => {
           password: 'asdasd123',
           createdAt: new Date(),
           updatedAt: new Date(),
-        },
+        } as any,
       ];
       jest.spyOn(service, 'findAll').mockResolvedValue(result);
 
@@ -83,6 +83,7 @@ describe('UsersController', () => {
         password: 'asdasd123',
         createdAt: new Date(),
         updatedAt: new Date(),
+        posts: [],
       };
       jest.spyOn(service, 'findOne').mockResolvedValue(result);
 
@@ -104,7 +105,7 @@ describe('UsersController', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         ...user,
-      };
+      } as any;
 
       jest.spyOn(service, 'update').mockResolvedValue(result);
 
