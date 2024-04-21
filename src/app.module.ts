@@ -4,8 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { Counter } from './counter/counter.entity';
 import { CounterModule } from './counter/counter.module';
+import { Counter } from './counter/entities/counter.entity';
+import { User } from './users/entities/user.entity';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -17,10 +19,11 @@ import { CounterModule } from './counter/counter.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [Counter],
+      entities: [Counter, User],
       synchronize: true,
     }),
     CounterModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
