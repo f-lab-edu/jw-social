@@ -1,5 +1,5 @@
 import {
-  BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -24,7 +24,7 @@ export class UsersService {
       email,
     });
     if (existingUser) {
-      throw new BadRequestException('이미 등록된 이메일입니다.');
+      throw new ConflictException('이미 등록된 이메일입니다.');
     }
 
     const hashedPassword = await this.hashPassword(password);
