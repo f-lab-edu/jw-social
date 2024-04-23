@@ -5,7 +5,6 @@ import { PostsService } from './posts.service';
 
 describe('PostsController', () => {
   let controller: PostsController;
-  // let service: PostsService;
 
   const mockPostsService = {
     create: jest.fn(),
@@ -27,7 +26,6 @@ describe('PostsController', () => {
     }).compile();
 
     controller = module.get<PostsController>(PostsController);
-    // service = module.get<PostsService>(PostsService);
   });
 
   it('should be defined', () => {

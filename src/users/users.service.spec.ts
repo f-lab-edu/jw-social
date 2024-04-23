@@ -1,4 +1,4 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
@@ -68,7 +68,7 @@ describe('UserService', () => {
       expect(mockRepository.save).toHaveBeenCalledWith(resultUser);
     });
 
-    it('중복된 이메일을 사용할 경우 BadRequestException을 발생시켜야 한다', async () => {
+    it('중복된 이메일을 사용할 경우 ConflictException 발생시켜야 한다', async () => {
       const createUserDto: CreateUserDto = {
         username: 'gildong-hong',
         email: 'hong@example.com',
@@ -78,7 +78,7 @@ describe('UserService', () => {
       mockRepository.findOneBy.mockResolvedValue(true);
 
       await expect(service.create(createUserDto)).rejects.toThrow(
-        BadRequestException,
+        ConflictException,
       );
     });
   });
