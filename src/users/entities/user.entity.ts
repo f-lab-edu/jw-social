@@ -1,20 +1,12 @@
 import { Exclude } from 'class-transformer';
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Unique,
-} from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
+import { Entity, Column, Unique, OneToMany } from 'typeorm';
+
+import { AbstractEntity } from '../../common/base.entity';
+import type { Post } from '../../posts/entities/post.entity';
 
 @Entity()
 @Unique(['email'])
-export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export class User extends AbstractEntity {
   @Column()
   username: string;
 
@@ -28,13 +20,6 @@ export class User {
   @Column({ nullable: true })
   avatar?: string;
 
-  @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ type: 'timestamp' })
-  updatedAt: Date;
-
-  constructor() {
-    this.id = uuidv4();
-  }
+  @OneToMany('Post', 'user')
+  posts: Post[];
 }

@@ -1,4 +1,4 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
@@ -54,6 +54,7 @@ describe('UserService', () => {
         id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
         createdAt: new Date(),
         updatedAt: new Date(),
+        posts: [],
         ...createUserDto,
       };
       mockRepository.create.mockReturnValue(resultUser);
@@ -67,7 +68,7 @@ describe('UserService', () => {
       expect(mockRepository.save).toHaveBeenCalledWith(resultUser);
     });
 
-    it('중복된 이메일을 사용할 경우 BadRequestException을 발생시켜야 한다', async () => {
+    it('중복된 이메일을 사용할 경우 ConflictException 발생시켜야 한다', async () => {
       const createUserDto: CreateUserDto = {
         username: 'gildong-hong',
         email: 'hong@example.com',
@@ -77,7 +78,7 @@ describe('UserService', () => {
       mockRepository.findOneBy.mockResolvedValue(true);
 
       await expect(service.create(createUserDto)).rejects.toThrow(
-        BadRequestException,
+        ConflictException,
       );
     });
   });
@@ -92,6 +93,7 @@ describe('UserService', () => {
           password: 'asdasd123',
           createdAt: new Date(),
           updatedAt: new Date(),
+          posts: [],
         },
       ];
       mockRepository.find.mockResolvedValue(result);
@@ -109,6 +111,7 @@ describe('UserService', () => {
         password: 'asdasd123',
         createdAt: new Date(),
         updatedAt: new Date(),
+        posts: [],
       };
       mockRepository.findOneBy.mockResolvedValue(result);
 
@@ -138,6 +141,7 @@ describe('UserService', () => {
         password: 'asdasd123',
         createdAt: new Date(),
         updatedAt: new Date(),
+        posts: [],
       };
       const updatedUser: User = {
         ...existingUser,
