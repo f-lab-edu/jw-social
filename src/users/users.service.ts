@@ -72,6 +72,15 @@ export class UsersService {
     }
   }
 
+  async validatePassword(
+    enteredPassword: string,
+    storedPasswordHash: string,
+  ): Promise<boolean> {
+    return (
+      (await hash(enteredPassword, storedPasswordHash)) === storedPasswordHash
+    );
+  }
+
   private async hashPassword(password: string): Promise<string> {
     const salt = await genSalt();
     return await hash(password, salt);
