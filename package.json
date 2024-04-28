@@ -75,6 +75,10 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
+    "coveragePathIgnorePatterns": [
+      ".*\\.module\\.ts$",
+      "main.ts"
+    ],
     "coverageThreshold": {
       "global": {
         "branches": 60,
