@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Delete } from '@nestjs/common';
 
-import { UUIDParam } from 'src/common/decorators/parse-uuid.decorator';
+import { UUIDParam } from '@/common/decorators/parse-uuid.decorator';
 
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';

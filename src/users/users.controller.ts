@@ -9,7 +9,7 @@ import {
   ClassSerializerInterceptor,
 } from '@nestjs/common';
 
-import { UUIDParam } from 'src/common/decorators/parse-uuid.decorator';
+import { UUIDParam } from '@/common/decorators/parse-uuid.decorator';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
