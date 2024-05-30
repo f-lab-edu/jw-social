@@ -79,6 +79,7 @@
     ],
     "coveragePathIgnorePatterns": [
       ".*\\.module\\.ts$",
+      ".*\\.decorator\\.ts$",
       "main.ts"
     ],
     "coverageThreshold": {
