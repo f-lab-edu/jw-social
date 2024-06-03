@@ -4,12 +4,12 @@ import {
   Post,
   Body,
   Patch,
-  Param,
   Delete,
-  ParseUUIDPipe,
   UseInterceptors,
   ClassSerializerInterceptor,
 } from '@nestjs/common';
+
+import { UUIDParam } from '@/common/decorators/parse-uuid.decorator';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -34,14 +34,14 @@ export class UsersController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
-  findOne(@Param('id', new ParseUUIDPipe()) id: string): Promise<User> {
+  findOne(@UUIDParam() id: string): Promise<User> {
     return this.userService.findOne(id);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Patch(':id')
   update(
-    @Param('id', new ParseUUIDPipe()) id: string,
+    @UUIDParam() id: string,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
     return this.userService.update(id, updateUserDto);
@@ -49,7 +49,7 @@ export class UsersController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Delete(':id')
-  remove(@Param('id', new ParseUUIDPipe()) id: string): Promise<void> {
+  remove(@UUIDParam() id: string): Promise<void> {
     return this.userService.remove(id);
   }
 }
