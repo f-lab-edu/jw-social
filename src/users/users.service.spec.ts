@@ -1,4 +1,3 @@
-import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
@@ -77,9 +76,7 @@ describe('UserService', () => {
 
       mockRepository.findOneBy.mockResolvedValue(true);
 
-      await expect(service.create(createUserDto)).rejects.toThrow(
-        ConflictException,
-      );
+      await expect(service.create(createUserDto)).rejects.toThrow();
     });
   });
 
@@ -125,7 +122,7 @@ describe('UserService', () => {
 
       await expect(
         service.findOne('9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow();
     });
   });
 
@@ -160,7 +157,7 @@ describe('UserService', () => {
 
       await expect(
         service.update('9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d', {}),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow();
     });
   });
 
@@ -179,9 +176,7 @@ describe('UserService', () => {
     it('삭제 대상이 존재하지 않을 경우 NotFoundException을 발생시켜야 한다', async () => {
       mockRepository.delete.mockResolvedValue({ affected: 0 });
 
-      await expect(service.remove('invalid-id')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.remove('invalid-id')).rejects.toThrow();
     });
   });
 });

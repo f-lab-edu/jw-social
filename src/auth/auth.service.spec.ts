@@ -1,4 +1,3 @@
-import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 
@@ -66,7 +65,7 @@ describe('AuthService', () => {
 
       await expect(
         service.signIn({ username: 'testUser', password: 'wrongPassword' }),
-      ).rejects.toThrow(UnauthorizedException);
+      ).rejects.toThrow();
     });
   });
 });

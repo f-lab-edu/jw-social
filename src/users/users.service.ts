@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { genSalt, hash } from 'bcrypt';
 import { Repository } from 'typeorm';
@@ -10,6 +6,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { EmailAlreadyExistsException, UserNotFoundException } from './errors';
 
 @Injectable()
 export class UsersService {
@@ -24,7 +21,7 @@ export class UsersService {
       email,
     });
     if (existingUser) {
-      throw new ConflictException('이미 등록된 이메일입니다.');
+      throw new EmailAlreadyExistsException();
     }
 
     const hashedPassword = await this.hashPassword(password);
@@ -46,7 +43,7 @@ export class UsersService {
     const user = await this.usersRepository.findOneBy({ id });
 
     if (!user) {
-      throw new NotFoundException(`User #${id} 가 존재하지 않습니다`);
+      throw new UserNotFoundException();
     }
 
     return user;
@@ -59,7 +56,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException(`User #${id} 가 존재하지 않습니다`);
+      throw new UserNotFoundException();
     }
 
     return this.usersRepository.save(user);
@@ -68,7 +65,7 @@ export class UsersService {
   async remove(id: string): Promise<void> {
     const result = await this.usersRepository.delete(id);
     if (result.affected === 0) {
-      throw new NotFoundException(`User #${id} 가 존재하지 않습니다`);
+      throw new UserNotFoundException();
     }
   }
 
