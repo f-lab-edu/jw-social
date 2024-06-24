@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
+import { PostNotFoundException } from './errors';
 
 @Injectable()
 export class PostsService {
@@ -27,7 +28,7 @@ export class PostsService {
     const post = await this.postRepository.findOneBy({ id });
 
     if (!post) {
-      throw new NotFoundException(`Post #${id} 가 존재하지 않습니다`);
+      throw new PostNotFoundException();
     }
 
     return post;
@@ -40,7 +41,7 @@ export class PostsService {
     });
 
     if (!post) {
-      throw new NotFoundException(`Post #${id} 가 존재하지 않습니다`);
+      throw new PostNotFoundException();
     }
 
     return await this.postRepository.save(post);
@@ -50,7 +51,7 @@ export class PostsService {
     const result = await this.postRepository.delete(id);
 
     if (result.affected === 0) {
-      throw new NotFoundException(`Post #${id} 가 존재하지 않습니다`);
+      throw new PostNotFoundException();
     }
   }
 }

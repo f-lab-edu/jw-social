@@ -1,9 +1,10 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { UsersService } from '../users/users.service';
 
 import { SignInDto } from './dto/sign-in.dto';
+import { PasswordIncorrectException } from './errors';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +23,7 @@ export class AuthService {
       user.password,
     );
     if (!isValid) {
-      throw new UnauthorizedException();
+      throw new PasswordIncorrectException();
     }
 
     const payload = { sub: user.id, username: user.username };

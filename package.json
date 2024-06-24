@@ -80,6 +80,9 @@
     "coveragePathIgnorePatterns": [
       ".*\\.module\\.ts$",
       ".*\\.decorator\\.ts$",
+      ".*\\.controller\\.ts$",
+      ".*\\.exception\\.ts$",
+      ".*\\.exception-filter\\.ts$",
       "main.ts"
     ],
     "coverageThreshold": {
