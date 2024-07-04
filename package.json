@@ -82,7 +82,7 @@
       ".*\\.decorator\\.ts$",
       ".*\\.controller\\.ts$",
       ".*\\.exception\\.ts$",
-      ".*\\.exception-filter\\.ts$",
+      "src/common/base-exception-filter/.*\\.ts$",
       "main.ts"
     ],
     "coverageThreshold": {
