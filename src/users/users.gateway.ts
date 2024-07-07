@@ -1,12 +1,10 @@
-import { NotFoundException } from '@nestjs/common';
 import {
   WebSocketGateway,
   SubscribeMessage,
   MessageBody,
   WebSocketServer,
-  ConnectedSocket,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
@@ -21,21 +19,13 @@ export class UsersGateway {
   @SubscribeMessage('updateUserInfo')
   async handleUpdateUserInfo(
     @MessageBody() data: { id: string; updateUserDto: UpdateUserDto },
-    @ConnectedSocket() client: Socket,
   ) {
-    try {
-      const updatedUser = await this.usersService.update(
-        data.id,
-        data.updateUserDto,
-      );
-      this.server.emit('userInfoUpdated', updatedUser);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        client.emit('error', { message: error.message });
-      } else {
-        client.emit('error', { message: 'Internal server error' });
-      }
-    }
+    const updatedUser = await this.usersService.update(
+      data.id,
+      data.updateUserDto,
+    );
+
+    this.server.emit('userInfoUpdated', updatedUser);
   }
 
   @SubscribeMessage('sendMessage')
