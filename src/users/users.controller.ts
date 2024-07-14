@@ -28,8 +28,10 @@ export class UsersController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  findAll(): Promise<User[]> {
-    return this.userService.findAll();
+  async findAll(): Promise<User[]> {
+    const users = await this.userService.findAll();
+
+    return users;
   }
 
   @UseInterceptors(ClassSerializerInterceptor)

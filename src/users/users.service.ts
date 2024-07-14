@@ -35,6 +35,11 @@ export class UsersService {
     return await this.usersRepository.save(newUser);
   }
 
+  async createMany(users: Partial<User>[]): Promise<User[]> {
+    const newUsers = this.usersRepository.create(users);
+    return await this.usersRepository.save(newUsers);
+  }
+
   async findAll(): Promise<User[]> {
     return await this.usersRepository.find();
   }
