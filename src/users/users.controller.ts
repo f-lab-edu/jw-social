@@ -7,9 +7,11 @@ import {
   Delete,
   UseInterceptors,
   ClassSerializerInterceptor,
+  Query,
 } from '@nestjs/common';
 
 import { UUIDParam } from '@/common/decorators/parse-uuid.decorator';
+import { PaginationDto } from '@/common/pagination';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -28,10 +30,19 @@ export class UsersController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  async findAll(): Promise<User[]> {
-    const users = await this.userService.findAll();
+  async findAll(
+    @Query() paginationDto: PaginationDto,
+  ): Promise<{ results: User[]; nextPageToken: string }> {
+    const { pageToken, maxPageSize } = paginationDto;
+    const { results, nextPageToken } = await this.userService.findAll(
+      pageToken,
+      maxPageSize ? Number(maxPageSize) : undefined,
+    );
 
-    return users;
+    return {
+      results,
+      nextPageToken,
+    };
   }
 
   @UseInterceptors(ClassSerializerInterceptor)

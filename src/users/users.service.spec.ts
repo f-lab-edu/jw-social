@@ -1,41 +1,61 @@
 import { Test } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
+
+import { PaginationService } from '@/common/pagination/pagination.service';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
+import { EmailAlreadyExistsException, UserNotFoundException } from './errors';
+import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
 
-describe('UserService', () => {
+describe('UsersService', () => {
   let service: UsersService;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let paginationService: PaginationService;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let usersRepository: UsersRepository;
 
   const mockRepository = {
     create: jest.fn(),
-    save: jest.fn(),
-    find: jest.fn(),
-    findOneBy: jest.fn(),
-    preload: jest.fn(),
+    findAll: jest.fn(),
+    findOne: jest.fn(),
+    findOneByEmail: jest.fn(),
+    update: jest.fn(),
     delete: jest.fn(),
+  };
+
+  const mockPaginationService = {
+    validateAndNormalizePageSize: jest.fn().mockReturnValue(10),
+    decryptPageToken: jest.fn().mockReturnValue(''),
+    getNextPageToken: jest.fn().mockReturnValue(''),
   };
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         UsersService,
+        UsersRepository,
         {
-          provide: getRepositoryToken(User),
+          provide: UsersRepository,
           useValue: mockRepository,
+        },
+        {
+          provide: PaginationService,
+          useValue: mockPaginationService,
         },
       ],
     }).compile();
 
     service = moduleRef.get<UsersService>(UsersService);
+    paginationService = moduleRef.get<PaginationService>(PaginationService);
+    usersRepository = moduleRef.get<UsersRepository>(UsersRepository);
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  describe('create 메소드', () => {
+  describe('create', () => {
     it('새로운 사용자를 생성하고 반환해야 한다', async () => {
       const createUserDto: CreateUserDto = {
         username: 'gildong-hong',
@@ -57,49 +77,59 @@ describe('UserService', () => {
         ...createUserDto,
       };
       mockRepository.create.mockReturnValue(resultUser);
-      mockRepository.save.mockResolvedValue(resultUser);
 
       expect(await service.create(createUserDto)).toEqual(resultUser);
       expect(mockRepository.create).toHaveBeenCalledWith({
         ...createUserDto,
         password: hashedPassword,
       });
-      expect(mockRepository.save).toHaveBeenCalledWith(resultUser);
     });
 
-    it('중복된 이메일을 사용할 경우 ConflictException 발생시켜야 한다', async () => {
+    it('중복된 이메일을 사용할 경우 EmailAlreadyExistsException 발생시켜야 한다', async () => {
       const createUserDto: CreateUserDto = {
         username: 'gildong-hong',
         email: 'hong@example.com',
         password: 'asdasd123',
       };
 
-      mockRepository.findOneBy.mockResolvedValue(true);
+      mockRepository.findOneByEmail.mockResolvedValue(true);
 
-      await expect(service.create(createUserDto)).rejects.toThrow();
+      await expect(service.create(createUserDto)).rejects.toThrow(
+        EmailAlreadyExistsException,
+      );
     });
   });
 
-  describe('findAll 메소드', () => {
+  describe('findAll', () => {
     it('모든 사용자 목록을 반환해야 한다', async () => {
-      const result: User[] = [
-        {
-          id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
-          username: 'gildong-hong',
-          email: 'hong@example.com',
-          password: 'asdasd123',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          posts: [],
-        },
-      ];
-      mockRepository.find.mockResolvedValue(result);
+      const paginationDto = { pageToken: '', maxPageSize: 10 };
 
-      expect(await service.findAll()).toEqual(result);
+      const result = {
+        results: [
+          {
+            id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
+            username: 'gildong-hong',
+            email: 'hong@example.com',
+            password: 'asdasd123',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            posts: [],
+          },
+        ],
+        nextPageToken: '',
+      };
+      mockRepository.findAll.mockResolvedValue(result.results);
+
+      expect(
+        await service.findAll(
+          paginationDto.pageToken,
+          paginationDto.maxPageSize,
+        ),
+      ).toEqual(result);
     });
   });
 
-  describe('findOne 메소드', () => {
+  describe('findOne', () => {
     it('특정 ID를 가진 사용자를 반환해야 한다', async () => {
       const result: User = {
         id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
@@ -110,27 +140,25 @@ describe('UserService', () => {
         updatedAt: new Date(),
         posts: [],
       };
-      mockRepository.findOneBy.mockResolvedValue(result);
+      mockRepository.findOne.mockResolvedValue(result);
 
       expect(
         await service.findOne('9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'),
       ).toEqual(result);
     });
 
-    it('특정 ID의 사용자가 없을 경우 NotFoundException을 발생시켜야 한다', async () => {
-      mockRepository.findOneBy.mockResolvedValue(null);
+    it('특정 ID의 사용자가 없을 경우 UserNotFoundException을 발생시켜야 한다', async () => {
+      mockRepository.findOne.mockResolvedValue(null);
 
       await expect(
         service.findOne('9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'),
-      ).rejects.toThrow();
+      ).rejects.toThrow(UserNotFoundException);
     });
   });
 
-  describe('update 메소드', () => {
+  describe('update', () => {
     it('특정 ID를 가진 사용자의 일부 정보만 업데이트하고 반환해야 한다', async () => {
-      const partialUpdateUserDto = {
-        email: 'update@example.com',
-      };
+      const partialUpdateUserDto = { email: 'update@example.com' };
       const existingUser: User = {
         id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
         username: 'gildong-hong',
@@ -144,28 +172,26 @@ describe('UserService', () => {
         ...existingUser,
         ...partialUpdateUserDto,
       };
-      mockRepository.preload.mockResolvedValue(updatedUser);
-      mockRepository.save.mockResolvedValue(updatedUser);
+      mockRepository.findOne.mockResolvedValue(existingUser);
+      mockRepository.update.mockResolvedValue(updatedUser);
 
       expect(
         await service.update(existingUser.id, partialUpdateUserDto),
       ).toEqual(updatedUser);
     });
 
-    it('업데이트할 사용자가 없을 경우 NotFoundException을 발생시켜야 한다', async () => {
-      mockRepository.preload.mockResolvedValue(null);
+    it('업데이트할 사용자가 없을 경우 UserNotFoundException을 발생시켜야 한다', async () => {
+      mockRepository.findOne.mockResolvedValue(null);
 
       await expect(
         service.update('9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d', {}),
-      ).rejects.toThrow();
+      ).rejects.toThrow(UserNotFoundException);
     });
   });
 
-  describe('remove 메소드', () => {
+  describe('remove', () => {
     it('특정 ID를 가진 사용자를 삭제해야 한다', async () => {
-      mockRepository.delete.mockResolvedValue({
-        affected: 1,
-      });
+      mockRepository.delete.mockResolvedValue({ affected: 1 });
 
       await service.remove('9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d');
       expect(mockRepository.delete).toHaveBeenCalledWith(
@@ -173,10 +199,12 @@ describe('UserService', () => {
       );
     });
 
-    it('삭제 대상이 존재하지 않을 경우 NotFoundException을 발생시켜야 한다', async () => {
+    it('삭제 대상이 존재하지 않을 경우 UserNotFoundException을 발생시켜야 한다', async () => {
       mockRepository.delete.mockResolvedValue({ affected: 0 });
 
-      await expect(service.remove('invalid-id')).rejects.toThrow();
+      await expect(service.remove('invalid-id')).rejects.toThrow(
+        UserNotFoundException,
+      );
     });
   });
 });
