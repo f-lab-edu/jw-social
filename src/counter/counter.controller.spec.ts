@@ -42,7 +42,7 @@ describe('CounterController', () => {
     });
   });
 
-  describe('getCurrentCounter 메소드', () => {
+  describe('getCurrentCounter', () => {
     it('현재 카운터 값 조회이 조회되어야 한다', async () => {
       const returnedValue = 0;
       jest.spyOn(mockService, 'getCounter').mockReturnValue(returnedValue);

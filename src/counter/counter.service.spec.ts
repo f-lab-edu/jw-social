@@ -31,7 +31,7 @@ describe('CounterService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('getCounter 메소드', () => {
+  describe('getCounter', () => {
     it('카운터를 조회할 때 현재까지 카운터 된 값을 반환해야 한다', async () => {
       const id = {
         id: 1,
