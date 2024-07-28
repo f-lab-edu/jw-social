@@ -1,51 +1,71 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { genSalt, hash } from 'bcrypt';
-import { Repository } from 'typeorm';
+import { DeleteResult } from 'typeorm';
+
+import { PaginationService } from '@/common/pagination';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { EmailAlreadyExistsException, UserNotFoundException } from './errors';
+import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    private readonly usersRepository: UsersRepository,
+    private readonly paginationService: PaginationService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { username, email, password } = createUserDto;
 
-    const existingUser = await this.usersRepository.findOneBy({
-      email,
-    });
+    const existingUser = await this.usersRepository.findOneByEmail(email);
     if (existingUser) {
       throw new EmailAlreadyExistsException();
     }
 
     const hashedPassword = await this.hashPassword(password);
 
-    const newUser = this.usersRepository.create({
+    const newUser = {
       username,
       email,
       password: hashedPassword,
-    });
+    };
 
-    return await this.usersRepository.save(newUser);
+    return await this.usersRepository.create(newUser);
   }
 
   async createMany(users: Partial<User>[]): Promise<User[]> {
-    const newUsers = this.usersRepository.create(users);
-    return await this.usersRepository.save(newUsers);
+    return await this.usersRepository.createMany(users);
   }
 
-  async findAll(): Promise<User[]> {
-    return await this.usersRepository.find();
+  async findAll(
+    pageToken: string = '',
+    maxPageSize: number = 10,
+  ): Promise<{ results: User[]; nextPageToken: string }> {
+    const validatedMaxPageSize =
+      this.paginationService.validateAndNormalizePageSize(maxPageSize);
+
+    const users = await this.usersRepository.findAll(
+      pageToken,
+      validatedMaxPageSize,
+    );
+
+    const nextPageToken = this.paginationService.getNextPageToken(
+      users,
+      validatedMaxPageSize,
+      (user) => user.id,
+    );
+
+    return {
+      results: users,
+      nextPageToken,
+    };
   }
 
   async findOne(id: string): Promise<User> {
-    const user = await this.usersRepository.findOneBy({ id });
+    const user = await this.usersRepository.findOne(id);
 
     if (!user) {
       throw new UserNotFoundException();
@@ -55,21 +75,23 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.usersRepository.preload({
-      id,
-      ...updateUserDto,
-    });
+    const user = await this.usersRepository.findOne(id);
 
     if (!user) {
       throw new UserNotFoundException();
     }
 
-    return this.usersRepository.save(user);
+    const updatedUser = {
+      ...user,
+      ...updateUserDto,
+    };
+
+    return await this.usersRepository.update(updatedUser);
   }
 
   async remove(id: string): Promise<void> {
-    const result = await this.usersRepository.delete(id);
-    if (result.affected === 0) {
+    const result: DeleteResult = await this.usersRepository.delete(id);
+    if (!result.affected) {
       throw new UserNotFoundException();
     }
   }

@@ -58,19 +58,25 @@ describe('UsersController', () => {
 
   describe('findAll', () => {
     it('모든 사용자를 찾아야 한다', async () => {
-      const result: User[] = [
-        {
-          id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
-          username: 'gildong-hong',
-          email: 'hong@example.com',
-          password: 'asdasd123',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        } as any,
-      ];
-      jest.spyOn(service, 'findAll').mockResolvedValue(result);
+      const paginationDto = { pageToken: '', maxPageSize: 10 };
 
-      expect(await controller.findAll()).toEqual(result);
+      const result = {
+        results: [
+          {
+            id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
+            username: 'gildong-hong',
+            email: 'hong@example.com',
+            password: 'asdasd123',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+        nextPageToken: '',
+      };
+
+      jest.spyOn(service, 'findAll').mockResolvedValue(result as any);
+
+      expect(await controller.findAll(paginationDto)).toEqual(result);
     });
   });
 
