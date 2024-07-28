@@ -29,6 +29,8 @@ export class UsersRepository {
 
     query.orderBy('user.id', 'ASC').take(maxPageSize);
 
+    query.cache(true, 60000);
+
     return await query.getMany();
   }
 

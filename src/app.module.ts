@@ -28,6 +28,13 @@ import { UsersModule } from './users/users.module';
         database: configService.get('DB_NAME'),
         entities: [Counter, User, Post],
         synchronize: true,
+        cache: {
+          type: 'redis',
+          options: {
+            host: configService.get('CACHE_HOST'),
+            port: configService.get('CACHE_PORT'),
+          },
+        },
       }),
     }),
     CounterModule,
