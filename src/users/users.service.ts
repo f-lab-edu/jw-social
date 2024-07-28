@@ -48,9 +48,7 @@ export class UsersService {
       this.paginationService.validateAndNormalizePageSize(maxPageSize);
 
     const users = await this.usersRepository.findAll(
-      pageToken === ''
-        ? ''
-        : this.paginationService.decryptPageToken(pageToken),
+      pageToken,
       validatedMaxPageSize,
     );
 
